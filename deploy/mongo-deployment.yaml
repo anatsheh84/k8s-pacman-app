@@ -19,7 +19,7 @@ spec:
         app.kubernetes.io/name: pacman
     spec:
       containers:
-      - image: bitnami/mongodb:latest
+      - image: bitnami/mongodb:6.0.8
         name: mongo
         ports:
         - name: mongo
