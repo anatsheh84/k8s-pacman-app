@@ -24,18 +24,6 @@ spec:
             - containerPort: 8080
               name: http-server
 ---
-apiVersion: route.openshift.io/v1
-kind: Route
-metadata:
-  name: pacman
-  labels:
-    app.kubernetes.io/name: pacman
-spec:
-  path: /
-  to:
-    kind: Service
-    name: pacman
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -52,6 +40,18 @@ spec:
   selector:
     name: pacman
     app.kubernetes.io/name: pacman
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: pacman
+  labels:
+    app.kubernetes.io/name: pacman
+spec:
+  path: /
+  to:
+    kind: Service
+    name: pacman
 ---
 apiVersion: apps/v1
 kind: Deployment
