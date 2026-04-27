@@ -23,6 +23,18 @@ spec:
         name: mongo
         app.kubernetes.io/name: pacman
     spec:
+      nodeName: ip-192-168-17-167.ec2.internal
+      securityContext:
+        fsGroup: 1001
+      initContainers:
+      - name: fix-perms
+        image: busybox:1.36
+        command: ["sh", "-c", "chown -R 1001:1001 /bitnami/mongodb"]
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+          - name: mongo-db
+            mountPath: /bitnami/mongodb
       containers:
       - image: bitnamilegacy/mongodb:5.0.10
         name: mongo
@@ -34,5 +46,6 @@ spec:
             mountPath: /bitnami/mongodb
       volumes:
         - name: mongo-db
-          persistentVolumeClaim:
-            claimName: mongo-storage
+          hostPath:
+            path: /var/lib/pacman-mongo
+            type: DirectoryOrCreate
