@@ -7,7 +7,7 @@ metadata:
     name: pacman
     app.kubernetes.io/name: pacman
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 80
       targetPort: 8080
