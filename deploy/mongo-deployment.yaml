@@ -3,6 +3,23 @@ kind: Namespace
 metadata:
   name: pacman-app
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-data
+  namespace: pacman-app
+  labels:
+    name: mongo
+    app.kubernetes.io/name: pacman
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  # storageClassName intentionally omitted — uses each cluster's default SC
+  # (gp3-csi on OCP, gp2 on EKS, ocs-storagecluster-ceph-rbd on ODF clusters).
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,6 +30,8 @@ metadata:
   namespace: pacman-app
 spec:
   replicas: 1
+  strategy:
+    type: Recreate          # PVC is RWO; can't have two pods mounting it
   selector:
     matchLabels:
       name: mongo
@@ -23,7 +42,6 @@ spec:
         name: mongo
         app.kubernetes.io/name: pacman
     spec:
-      nodeName: ip-192-168-17-167.ec2.internal
       securityContext:
         fsGroup: 1001
       initContainers:
@@ -46,6 +64,5 @@ spec:
             mountPath: /bitnami/mongodb
       volumes:
         - name: mongo-db
-          hostPath:
-            path: /var/lib/pacman-mongo
-            type: DirectoryOrCreate
+          persistentVolumeClaim:
+            claimName: mongo-data
